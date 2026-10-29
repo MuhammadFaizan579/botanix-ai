@@ -1,4 +1,4 @@
-# Flower Species Classification (Deep Learning Semester Project)
+# BotaniX AI: Flower Species Classification
 
 Identifies 102 flower species from a photo using transfer learning with MobileNetV2, and runs in the browser through a web app deployed on Vercel.
 
@@ -53,7 +53,7 @@ Training curves are in `results/curves.png` and example predictions in `results/
 ├── requirements.txt
 ├── class_names.json            102 class names (index = model output index)
 ├── notebooks/
-│   └── FlowerClassification.ipynb    full training notebook with outputs
+│   └── BotaniX_Flower_Classification.ipynb    full training notebook with outputs
 ├── src/
 │   ├── predict.py              predict one image
 │   └── evaluate.py             re-compute test accuracy and F1
