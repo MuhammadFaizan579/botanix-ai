@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BotaniX AI | Flower Species Classification</title>
+<meta name="description" content="BotaniX AI identifies 102 flower species from a photo. MobileNetV2 trained on Oxford 102 Flowers (97.72% test accuracy), running in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F6F8FB;--card:#fff;--ink:#0F1B2D;--muted:#566579;--line:#E2E8F0;--brand:#0E7C66;--brand-d:#0A5E4E;--tint:#E8F5F1;--warn:#B45309;
+--font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color-scheme:light}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.65 var(--font)}
+[hidden]{display:none!important}
+.wrap{max-width:1120px;margin:0 auto;padding:0 1.25rem}
+a:focus-visible,button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.top{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:64px}
+.brand{display:flex;align-items:center;gap:.6rem;font-weight:800;font-size:1.1rem;color:var(--ink);text-decoration:none;white-space:nowrap}
+.logo{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:var(--brand);color:#fff;font-weight:800}
+nav{display:flex;gap:.25rem;overflow-x:auto;min-width:0}
+nav a{padding:.45rem .8rem;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:600;font-size:.92rem;white-space:nowrap}
+nav a:hover,nav a.on{background:var(--tint);color:var(--brand-d)}
+.hero{display:grid;gap:2rem;padding:3rem 1.25rem 1.5rem;align-items:center;scroll-margin-top:72px}
+@media(min-width:900px){.hero{grid-template-columns:1fr 1.25fr;gap:3rem;padding-top:4rem}}
+.eyebrow{display:inline-block;padding:.3rem .75rem;border-radius:99px;background:var(--tint);color:var(--brand-d);font-weight:700;font-size:.8rem}
+h1{font-size:clamp(2.4rem,6vw,3.6rem);line-height:1.05;letter-spacing:-.03em;margin:1rem 0 .4rem;font-weight:800}
+.sub{font-size:1.2rem;font-weight:600;color:var(--brand-d);margin:0 0 1rem}
+.lead{color:var(--muted);max-width:34rem;margin:0 0 1.5rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.7rem 1.2rem;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;font:600 .95rem var(--font);text-decoration:none;cursor:pointer}
+.btn:hover{background:var(--brand-d)}
+.btn.ghost{background:#fff;color:var(--brand-d)}.btn.ghost:hover{background:var(--tint)}
+.btn.sm{padding:.45rem .85rem;font-size:.85rem;border-radius:8px}
+.cta{display:flex;gap:.75rem;flex-wrap:wrap}
+.demo{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.25rem;box-shadow:0 12px 32px -18px rgba(15,27,45,.3)}
+.demo.over{outline:2px dashed var(--brand);outline-offset:-6px}
+.sr{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.35rem;min-height:260px;border:2px dashed #9CCDBF;border-radius:12px;padding:1rem;cursor:pointer;color:var(--muted);background:#FAFDFC}
+.drop:hover{background:var(--tint)}.drop b{color:var(--ink);font-size:1.1rem}
+.drop i{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--tint);color:var(--brand);font-style:normal;font-size:1.5rem;margin-bottom:.4rem}
+.result-view{display:grid;grid-template-columns:minmax(0,250px) 1fr;gap:1.5rem;align-items:start}
+@media(max-width:620px){.result-view{grid-template-columns:1fr}}
+.photo img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;background:var(--bg)}
+.change{display:inline-block;margin-top:.75rem;padding:.5rem .9rem;border:1px solid var(--brand);border-radius:8px;color:var(--brand-d);font-weight:600;font-size:.9rem;cursor:pointer}
+.change:hover{background:var(--tint)}
+#file:focus-visible~.drop,#file:focus-visible~.result-view .change{outline:3px solid var(--brand);outline-offset:3px}
+#status{margin:1rem 0 0;font-size:.92rem;color:var(--muted)}#status:empty{display:none}#status.error{color:#B91C1C}
+.note{margin:.9rem 0 0;font-size:.8rem;color:var(--muted)}
+#results{list-style:none;margin:0;padding:0}#results li{margin-bottom:.9rem}
+.row{display:flex;justify-content:space-between;gap:1rem;font-weight:600;text-transform:capitalize}
+.row span:last-child{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.meter{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:.3rem}
+.meter i{display:block;height:100%;width:0;background:#A7CFC4;transition:width .5s ease}
+#results li:first-child .meter i{background:var(--brand)}
+#results li:first-child .row{font-size:1.2rem;font-weight:800}
+@media(prefers-reduced-motion:reduce){.meter i{transition:none}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;padding-bottom:.5rem}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.25rem}
+.stat b{display:block;font-size:1.8rem;letter-spacing:-.02em;line-height:1.25}.stat span{color:var(--muted);font-size:.9rem}
+section.s{padding:3.25rem 0 0;scroll-margin-top:72px}
+h2{font-size:1.75rem;letter-spacing:-.02em;margin:0 0 .4rem}
+.sec-sub{color:var(--muted);margin:0 0 1.5rem;max-width:44rem}
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.25rem}
+.card h3{margin:0 0 .6rem;font-size:1.05rem}
+.card ul{margin:0;padding-left:1.1rem;color:var(--muted)}.card li{margin-bottom:.35rem}
+.steps{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));counter-reset:s}
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.25rem}
+.step::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;font-weight:700;font-size:.85rem;margin-bottom:.6rem}
+.step b{display:block}.step span{color:var(--muted);font-size:.92rem}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{padding:.6rem .9rem;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{background:var(--tint);color:var(--brand-d);font-weight:700}tr:last-child td{border-bottom:0}
+.sub-h{margin:2rem 0 .75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.8rem}
+.lk{display:flex;flex-direction:column;gap:.5rem}
+.lk .head{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.lk h3{margin:0;font-size:1rem}.lk p{margin:0;color:var(--muted);font-size:.9rem;flex:1}
+.badge{font-size:.72rem;font-weight:700;padding:.2rem .55rem;border-radius:99px;background:var(--tint);color:var(--brand-d);white-space:nowrap}
+.badge.pending{background:#FEF3C7;color:var(--warn)}
+.acts{display:flex;gap:.5rem;margin-top:.4rem}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem}
+footer{margin-top:4rem;background:var(--ink);color:#C9D3E0;padding:2.5rem 0 2rem;font-size:.92rem}
+footer .wrap{display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+footer b{color:#fff}footer p{margin:.2rem 0}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap bar">
+  <a class="brand" href="#top"><span class="logo">B</span>BotaniX AI</a>
+  <nav id="nav" aria-label="Page sections">
+    <a href="#demo-section">Demo</a><a href="#results-section">Results</a><a href="#overview">Dataset &amp; model</a><a href="#links">Project links</a>
+  </nav>
+</div></header>
+
+<main id="top">
+  <section class="wrap hero" id="demo-section">
+    <div>
+      <span class="eyebrow">Deep Learning · Semester Project</span>
+      <h1>BotaniX AI</h1>
+      <p class="sub">Flower species classification with deep learning</p>
+      <p class="lead">Upload a flower photo and BotaniX AI names the species out of 102, with a confidence score for its top three guesses. The model runs in your browser, so your photo never leaves your device.</p>
+      <div class="cta"><a class="btn" href="#demo">Try the demo</a><a class="btn ghost" href="#links">All project links</a></div>
+    </div>
+    <div class="demo" id="demo">
+      <input type="file" id="file" class="sr" accept="image/*">
+      <label class="drop" id="drop" for="file"><i aria-hidden="true">+</i><b>Choose a flower photo</b><span>or drag and drop it here (JPG, PNG, WebP)</span></label>
+      <div class="result-view" id="resultView" hidden>
+        <div class="photo"><img id="preview" alt="Preview of the selected flower photo"><label class="change" for="file">Choose another photo</label></div>
+        <ul id="results" aria-label="Top predictions" aria-live="polite"></ul>
+      </div>
+      <p id="status" role="status" aria-live="polite">Loading model…</p>
+      <p class="note">Covers 102 flower species only. Predictions are for educational use and can be wrong.</p>
+    </div>
+  </section>
+
+  <div class="wrap stats">
+    <div class="stat"><b>97.72%</b><span>Test accuracy</span></div>
+    <div class="stat"><b>0.9725</b><span>Macro F1-score</span></div>
+    <div class="stat"><b>102</b><span>Flower species</span></div>
+    <div class="stat"><b>9.4 MB</b><span>ONNX model, runs in-browser</span></div>
+  </div>
+
+  <section class="wrap s" id="how">
+    <h2>How it works</h2>
+    <p class="sec-sub">Everything happens inside your browser: no server, no upload.</p>
+    <div class="steps">
+      <div class="step"><b>Upload a photo</b><span>Any JPG, PNG or WebP image of a flower.</span></div>
+      <div class="step"><b>Preprocess</b><span>Resize to 256, centre-crop to 224×224, ImageNet normalisation, exactly as in training.</span></div>
+      <div class="step"><b>MobileNetV2 inference</b><span>The fine-tuned network (ONNX) runs with ONNX Runtime Web.</span></div>
+      <div class="step"><b>Top-3 species</b><span>Softmax confidence for the three most likely flowers.</span></div>
+    </div>
+  </section>
+
+  <section class="wrap s" id="results-section">
+    <h2>Results</h2>
+    <p class="sec-sub">Measured on 1,229 held-out test images. Training took about 8.4 minutes on a Colab T4 GPU.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Epoch</th><th>Train loss</th><th>Train acc.</th><th>Val. loss</th><th>Val. acc.</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>1.764</td><td>0.634</td><td>0.488</td><td>0.902</td></tr>
+        <tr><td>2</td><td>0.357</td><td>0.928</td><td>0.283</td><td>0.931</td></tr>
+        <tr><td>3</td><td>0.188</td><td>0.965</td><td>0.204</td><td>0.952</td></tr>
+        <tr><td>4</td><td>0.094</td><td>0.983</td><td>0.159</td><td>0.959</td></tr>
+        <tr><td>5</td><td>0.061</td><td>0.990</td><td>0.140</td><td>0.968</td></tr>
+        <tr><td>6</td><td>0.034</td><td>0.995</td><td>0.114</td><td>0.974</td></tr>
+        <tr><td>7</td><td>0.025</td><td>0.997</td><td>0.114</td><td>0.976</td></tr>
+        <tr><td>8</td><td>0.016</td><td>0.999</td><td>0.105</td><td>0.976</td></tr>
+        <tr><td>9</td><td>0.014</td><td>0.999</td><td>0.106</td><td>0.976</td></tr>
+        <tr><td>10</td><td>0.013</td><td>0.999</td><td>0.107</td><td>0.976</td></tr>
+      </tbody></table></div>
+    <div class="grid" style="margin-top:1rem">
+      <div class="card"><h3>Test performance</h3><ul><li>Accuracy: <b>97.72%</b> (1,201 of 1,229 correct)</li><li>Macro F1-score: <b>0.9725</b></li><li>Misclassified: 28 images</li></ul></div>
+      <div class="card"><h3>Error analysis</h3><ul><li>Most errors are look-alike species</li><li>Petunia → tree mallow (2×)</li><li>Sword lily → canna lily, rose → camellia, garden phlox → petunia, tree poppy → windflower (1× each)</li></ul></div>
+    </div>
+  </section>
+
+  <section class="wrap s" id="overview">
+    <h2>Dataset &amp; model</h2>
+    <p class="sec-sub">Transfer learning with a small, fast network that is easy to ship to the web.</p>
+    <div class="grid">
+      <div class="card"><h3>Dataset</h3><ul>
+        <li>Oxford 102 Flowers (Visual Geometry Group, University of Oxford)</li>
+        <li>8,189 images, 102 species, 40 to 258 images per class</li>
+        <li>Official splits merged, then re-split 70/15/15 with seed 42</li>
+        <li>Train 5,732 · Validation 1,228 · Test 1,229</li>
+        <li>Training-only augmentation: random crop, flip, rotation, colour jitter</li></ul></div>
+      <div class="card"><h3>Model &amp; training</h3><ul>
+        <li>MobileNetV2 pretrained on ImageNet, new 102-class head, all layers fine-tuned</li>
+        <li>AdamW, learning rate 3e-4, cosine schedule, batch size 32</li>
+        <li>Cross-entropy loss, 10 epochs, best epoch chosen on validation accuracy</li>
+        <li>PyTorch on Google Colab (T4 GPU), about 8.4 minutes</li></ul></div>
+      <div class="card"><h3>Deployment</h3><ul>
+        <li>Exported to ONNX (9.4 MB, single file)</li>
+        <li>Static site on Vercel using ONNX Runtime Web</li>
+        <li>Warns when top confidence is below 50%</li>
+        <li><code>predict.py</code> and <code>evaluate.py</code> in the repository reproduce predictions and test metrics</li></ul></div>
+    </div>
+  </section>
+
+  <section class="wrap s" id="links">
+    <div class="toolbar">
+      <div><h2>Project links</h2><p class="sec-sub" style="margin:0">Everything for this project in one place. Each card opens in a new tab.</p></div>
+      <button class="btn ghost" id="copyAll" type="button">Copy all links</button>
+    </div>
+
+    <div class="sub-h">Core deliverables</div>
+    <div class="grid">
+      <article class="card lk" data-link><div class="head"><h3>Live web app (Vercel)</h3><span class="badge"></span></div><p>The deployed BotaniX AI application.</p><div class="acts"><a class="btn sm open" href="REPLACE_WITH_VERCEL_LINK" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+      <article class="card lk" data-link><div class="head"><h3>GitHub repository</h3><span class="badge"></span></div><p>Source code, notebook, model weights and README.</p><div class="acts"><a class="btn sm open" href="REPLACE_WITH_GITHUB_LINK" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+      <article class="card lk" data-link><div class="head"><h3>YouTube video</h3><span class="badge"></span></div><p>Presentation with voiceover and a demo of the app.</p><div class="acts"><a class="btn sm open" href="REPLACE_WITH_YOUTUBE_LINK" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+      <article class="card lk" data-link><div class="head"><h3>LinkedIn post</h3><span class="badge"></span></div><p>Public post announcing the project.</p><div class="acts"><a class="btn sm open" href="REPLACE_WITH_LINKEDIN_LINK" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+    </div>
+
+    <div class="sub-h">Project resources</div>
+    <div class="grid">
+      <article class="card lk" data-link><div class="head"><h3>Project report (PDF)</h3><span class="badge"></span></div><p>Problem, dataset, architecture, training and results.</p><div class="acts"><a class="btn sm open" href="Flower_Classification_Report.pdf" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+      <article class="card lk" data-link><div class="head"><h3>Presentation slides (PDF)</h3><span class="badge"></span></div><p>Seven slides from problem statement to conclusion.</p><div class="acts"><a class="btn sm open" href="Flower_Classification_Presentation.pdf" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+      <article class="card lk" data-link><div class="head"><h3>Dataset</h3><span class="badge"></span></div><p>Oxford 102 Flowers, Visual Geometry Group.</p><div class="acts"><a class="btn sm open" href="https://www.robots.ox.ac.uk/~vgg/data/flowers/102/" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+      <article class="card lk" data-link><div class="head"><h3>Training notebook</h3><span class="badge"></span></div><p>Data preparation, training, evaluation and export.</p><div class="acts"><a class="btn sm open" href="REPLACE_WITH_GITHUB_LINK/blob/main/notebooks/FlowerClassification.ipynb" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+      <article class="card lk" data-link><div class="head"><h3>Model weights</h3><span class="badge"></span></div><p>PyTorch weights (best_model.pth) and the ONNX model.</p><div class="acts"><a class="btn sm open" href="REPLACE_WITH_GITHUB_LINK/tree/main/weights" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+      <article class="card lk" data-link><div class="head"><h3>Source code</h3><span class="badge"></span></div><p>predict.py and evaluate.py scripts.</p><div class="acts"><a class="btn sm open" href="REPLACE_WITH_GITHUB_LINK/tree/main/src" target="_blank" rel="noopener">Open ↗</a><button class="btn sm ghost copy" type="button">Copy link</button></div></article>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <div><b>BotaniX AI</b><p>Flower species classification with deep learning and transfer learning. Predictions cover 102 species and are for educational use.</p></div>
+  <div><p><b>Muhammad Faizan</b></p><p>Roll number: SU92-BSCSM-F23-169</p><p>Department of Computer Science, The Superior University</p><p>Deep Learning · Dr Munir Ahmad</p></div>
+</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
