@@ -9,8 +9,7 @@ Identifies 102 flower species from a photo using transfer learning with MobileNe
 | Live web app (Vercel) | https://botanix-flower-ai.vercel.app/ |
 | Project report | https://botanix-flower-ai.vercel.app/Flower_Classification_Report.pdf |
 | Presentation | https://botanix-flower-ai.vercel.app/Flower_Classification_Presentation.pdf |
-| YouTube video | REPLACE_WITH_YOUTUBE_LINK |
-| LinkedIn post | REPLACE_WITH_LINKEDIN_LINK |
+| LinkedIn post |[ [https://lnkd.in/p/dqXdgjjH |
 | Dataset | https://www.robots.ox.ac.uk/~vgg/data/flowers/102/ |
 | Training notebook | [notebooks/BotaniX_Flower_Classification.ipynb](notebooks/BotaniX_Flower_Classification.ipynb) |
 | Model weights | [weights/](weights/) |
